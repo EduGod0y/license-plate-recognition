@@ -1,7 +1,8 @@
-from os import walk
+import os
 import cv2
 from lib.filters import get_grayscale, thresholding, pytesseract
 from lib.format_output import format_output
+import matplotlib.pyplot as plt
 
 
 def apply_filter(plate):
@@ -11,9 +12,12 @@ def apply_filter(plate):
 
 
 def scan_plate(image):
-    custom_config = r'-c tessedit_char_blacklist=abcdefghijklmnopqrstuvwxyz/ --psm 6'
+    plt.imshow(image)
+    plt.show()
+    custom_config = r'-c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- --psm 6'
     plate_number = (pytesseract.image_to_string(image, config=custom_config))
-    return plate_number[:-2]
+    print(plate_number.strip())
+    return plate_number.strip()
 
 
 def validate_plate(plate_number, authorized_plate):
@@ -26,18 +30,28 @@ def validate_plate(plate_number, authorized_plate):
 def main():
     authorized_plate = ['FUN-0972', 'BRA2E19']
 
-    images = [
-        '../images/placa1.jpg',
-        '../images/placa2.jpg',
-        '../images/placa3.jpg',
-        '../images/placa4.jpg'
-    ]
+    # Caminho absoluto para a pasta de imagens
+    image_dir = r'C:\Users\T-Gamer\Documents\GitHub\CarPlate-Recognition\images'
+
+    # Verifica se a pasta existe
+    if not os.path.exists(image_dir):
+        print(f"Erro: A pasta '{image_dir}' não existe.")
+        return
+
+    # Lista os arquivos na pasta
+    filenames = os.listdir(image_dir)
+    if not filenames:
+        print(f"Erro: A pasta '{image_dir}' está vazia.")
+        return
+
+    # Caminhos completos para as imagens
+    images = [os.path.join(image_dir, file) for file in filenames]
 
     plates = []
     plates_filter_applied = []
     plates_numbers = []
     data = []
-    _, _, filenames = next(walk('../images/'))
+    
 
     # Append the files name to list data
     for i in range(len(filenames)):
@@ -64,4 +78,5 @@ def main():
     format_output(data)
 
 
-main()
+if __name__ == "__main__":
+    main()

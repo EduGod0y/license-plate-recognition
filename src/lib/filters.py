@@ -16,7 +16,7 @@ def get_grayscale(image):
 
 # noise removal
 def remove_noise(image):
-    return cv2.medianBlur(image, 5)
+    return cv2.GaussianBlur(image, (5, 5), 0)
 
 
 # thresholding
@@ -44,4 +44,5 @@ def opening(image):
 
 # canny edge detection
 def canny(image):
+    
     return cv2.Canny(image, 100, 200)
